@@ -14,3 +14,4 @@ export default prisma;
 
 // Ensure the prisma instance is reused across hot reloads in development
 if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma;
+
