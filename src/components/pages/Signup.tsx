@@ -28,6 +28,7 @@ import { GoogleIcon } from "@/components/ui/google-icon";
 import { GoogleAuthButton } from "@/components/Auth/GoogleAuthButton";
 import { InputField } from "@/components/Auth/FormFields";
 import { SignUpFormValues, signUpSchema } from "@/lib/schema/signupSchema";
+import { authClient } from "@/lib/auth-client";
 
 const Signup = () => {
   const form = useForm<SignUpFormValues>({
@@ -43,7 +44,43 @@ const Signup = () => {
   const { toast } = useToast();
 
   const onSubmit = async (data: SignUpFormValues) => {
-    console.log("signup data", data);
+    form.reset();
+    await authClient.signUp.email({
+      email: data.email,
+      password: data.password,
+      name: data.name,
+    },{
+      onRequest: () => {
+        setPending(true);
+      } 
+    ,
+      onSuccess: () => {
+        setPending(false);
+        toast({
+          title: "Success",
+          description: "Check your email to verify your account",
+          variant: "default",
+        });
+
+        console.log("signup success");
+      },
+      onError: (ctx) => {
+        console.log("signup error", ctx);
+        setPending(false);
+        toast({
+          variant: "destructive", 
+          title: "Something went wrong",
+          description: ctx.error.message?? "Something went wrong",
+        });
+        console.log("signup error", ctx.error.message);
+      },
+      onComplete: () => {
+        setPending(false);
+      }   
+    }
+     
+  )
+    // console.log("signup data", data);
   };
 
   return (
